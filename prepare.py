@@ -27,7 +27,7 @@ def basic_clean(text):
 
 
 def tokenize(text):
-        '''
+    '''
     This function takes in text
     and returns the text as individual tokens put back into the original text
     '''
@@ -37,7 +37,7 @@ def tokenize(text):
 
 
 def stem(text):
-      '''
+    '''
     This function takes in text
     and returns the stem word joined back into the original text
     '''
@@ -77,7 +77,7 @@ def remove_stopwords(text, extra_words=[], exclude_words=[]):
     return text_without_stopwords   
 
 
-def prep_article_data(df, column, extra_words=[], exclude_words=[]):
+def prep_data(df, column, extra_words=[], exclude_words=[]):
     '''
     This function take in a df and the string name for a text column with 
     option to pass lists for extra_words and exclude_words and
