@@ -21,7 +21,7 @@ from env import github_token, github_username
 # TODO: Add your github username to your env.py file under the variable `github_username`
 # TODO: Add more repositories to the `REPOS` list below.
 
-REPOS = []
+REPOS = ['nytimes/covid-19-data', 'covid19india/covid19india-react']
  
 
 headers = {"Authorization": f"token {github_token}", "User-Agent": github_username}
