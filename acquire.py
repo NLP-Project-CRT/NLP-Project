@@ -10,7 +10,9 @@ To create the `data.json` file that contains the data.
 import os
 import json
 from typing import Dict, List, Optional, Union, cast
+import re
 import requests
+from bs4 import BeautifulSoup
 
 from env import github_token, github_username
 from repos import REPOS
@@ -21,6 +23,55 @@ from repos import REPOS
 #     2. Save it in your env.py file under the variable `github_token`
 # TODO: Add your github username to your env.py file under the variable `github_username`
 # TODO: Add more repositories to the `REPOS` list below.
+
+
+#################### Get Repo Links ####################
+
+
+def get_repo_links(topic, github_token, github_username, number_of_pages=10):
+    '''
+    
+    Takes in a topic, your unique github API token, and your github username as
+    strings and an interger for the number of pages to query
+    
+    Returns: list of repositories from GitHub in the form of
+    '<username>/<repo_name>'
+    
+    '''
+    
+    # set URL without page number
+    url = 'https://github.com/topics/' + topic + '?&s=stars&page='
+    # set header for github auth
+    headers = {"Authorization": f"token {github_token}",
+               "User-Agent": github_username}
+    # set empty list for total repos scraped
+    list_of_repos = []
+    # for each page in range of provided number
+    for i in range(1, number_of_pages + 1):
+        # obtain page data
+        response = requests.get(url + str(i), headers)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        content = soup.find_all('h3')
+        # set empty list to agg for each page
+        page_list = []
+        for repo in content:
+            # confirms that h3 tag contains repo information
+            if [re.search(r'(\S+)', x.text).group(1) for x in repo.find_all('a')] != []:
+                # returns owner username and repo name
+                user_name, repo_name = [re.search(r'(\S+)', x.text)\
+                                         .group(1) for x in repo.find_all('a')]
+            # add to page list for each repo on page
+            page_list.extend([f'{user_name}/{repo_name}'])
+        # add new page list into existing list for total repos
+        list_of_repos.extend(page_list)
+    # saves returned list into .py file for calling in later functions
+    with open("repos.py", "w") as repos:
+        repos.write(f'REPOS = {list_of_repos}')
+    
+    return list_of_repos
+
+
+##########################################################
 
 
 headers = {"Authorization": f"token {github_token}", "User-Agent": github_username}
