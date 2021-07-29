@@ -27,7 +27,7 @@ def basic_clean(text):
 
 
 def tokenize(text):
-        '''
+    '''
     This function takes in text
     and returns the text as individual tokens put back into the original text
     '''
@@ -35,8 +35,9 @@ def tokenize(text):
     text = tokenizer.tokenize(text, return_str=True)
     return text
 
+
 def stem(text):
-      '''
+    '''
     This function takes in text
     and returns the stem word joined back into the original text
     '''
@@ -44,6 +45,7 @@ def stem(text):
     stems = [ps.stem(word) for word in text.split()]
     text_stemmed = ' '.join(stems)
     return text_stemmed
+
 
 def lemmatize(text):
     '''
@@ -54,6 +56,7 @@ def lemmatize(text):
     lemmas = [wnl.lemmatize(word) for word in text.split()]
     text_lemmatized = ' '.join(lemmas)
     return text_lemmatized
+
 
 def remove_stopwords(text, extra_words=[], exclude_words=[]):
     '''
@@ -71,7 +74,39 @@ def remove_stopwords(text, extra_words=[], exclude_words=[]):
     words = text.split()
     filtered_words = [word for word in words if word not in stopword_list]
     text_without_stopwords = ' '.join(filtered_words)
-    return text_without_stopwords    
+    return text_without_stopwords   
+
+
+def prep_data(df, column, extra_words=[], exclude_words=[]):
+    '''
+    This function take in a df and the string name for a text column with 
+    option to pass lists for extra_words and exclude_words and
+    returns a df with the text article title, original text, stemmed text,
+    lemmatized text, cleaned, tokenized, & lemmatized text with stopwords removed.
+    '''
+    df['clean'] = df[column].apply(basic_clean)\
+                            .apply(tokenize)\
+                            .apply(remove_stopwords, 
+                                   extra_words=extra_words, 
+                                   exclude_words=exclude_words)
+    
+    df['stemmed'] = df[column].apply(basic_clean)\
+                            .apply(tokenize)\
+                            .apply(stem)\
+                            .apply(remove_stopwords, 
+                                   extra_words=extra_words, 
+                                   exclude_words=exclude_words)
+    
+    df['lemmatized'] = df[column].apply(basic_clean)\
+                            .apply(tokenize)\
+                            .apply(lemmatize)\
+                            .apply(remove_stopwords, 
+                                   extra_words=extra_words, 
+                                   exclude_words=exclude_words)
+    
+    return df[['title', column,'clean', 'stemmed', 'lemmatized']]
+
+
 
 def split(df, stratify_by=None):
    
