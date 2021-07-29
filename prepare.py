@@ -14,6 +14,12 @@ from sklearn.model_selection import train_test_split
 
 
 def basic_clean(text):
+    ''' 
+    This function takes in the original text.
+    The text is all lowercased and any characters that are not ascii are ignored
+    additionally, special characters are all removed.
+    A clean verion of the text is then returned
+    '''
     text = text.lower()
     text = unicodedata.normalize('NFKD', text).encode('ascii','ignore').decode('utf-8','ignore')
     text = re.sub(r"[^a-z0-9'\s]",'',text)
@@ -21,23 +27,39 @@ def basic_clean(text):
 
 
 def tokenize(text):
+        '''
+    This function takes in text
+    and returns the text as individual tokens put back into the original text
+    '''
     tokenizer = nltk.tokenize.ToktokTokenizer()
     text = tokenizer.tokenize(text, return_str=True)
     return text
 
 def stem(text):
+      '''
+    This function takes in text
+    and returns the stem word joined back into the original text
+    '''
     ps = nltk.porter.PorterStemmer()
     stems = [ps.stem(word) for word in text.split()]
     text_stemmed = ' '.join(stems)
     return text_stemmed
 
 def lemmatize(text):
+    '''
+    This function takes in text
+    and returns the lemmatized word joined back into the text
+    '''
     wnl = nltk.stem.WordNetLemmatizer()
     lemmas = [wnl.lemmatize(word) for word in text.split()]
     text_lemmatized = ' '.join(lemmas)
     return text_lemmatized
 
 def remove_stopwords(text, extra_words=[], exclude_words=[]):
+    '''
+    This function takes in text, extra words and exclude words
+    and returns a list of text with stopword removed
+    '''
     #nltk.download('stopwords')
     stopword_list = stopwords.words('english')
     if len(extra_words) > 0 :
