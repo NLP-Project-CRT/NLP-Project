@@ -87,15 +87,21 @@ def remove_code_snippest(df):
     '''
 
     # remove HTML and markdown code
-    df['cleaned'] = df.readme_contents.apply(lambda row: re.sub(r'(\<.+\>)', '', row))
-    df['cleaned'] = df.cleaned.apply(lambda row: re.sub(r'!?(\[.+\])(\(.+\))?', '', row))
+    df['cleaned_readme'] = df.readme_contents\
+                    .apply(lambda row: re.sub(r'(\<.+\>)', '', row))
+    df['cleaned_readme'] = df.cleaned_readme\
+                    .apply(lambda row: re.sub(r'!?(\[.+\])(\(.+\))?', '', row))
     # remove coded spaces and page breaks
-    df['cleaned'] = df.cleaned.apply(lambda row: re.sub(r'(\n+)', ' ', row))
-    df['cleaned'] = df.cleaned.apply(lambda row: re.sub(r'(&nbsp;+)', '', row))
+    df['cleaned_readme'] = df.cleaned_readme\
+                    .apply(lambda row: re.sub(r'(\n+)', ' ', row))
+    df['cleaned_readme'] = df.cleaned_readme\
+                    .apply(lambda row: re.sub(r'(&nbsp;+)', '', row))
     # remove naked hyperlinks
-    df['cleaned'] = df.cleaned.apply(lambda row: re.sub(r'http\S+', '', row))
+    df['cleaned_readme'] = df.cleaned_readme\
+                    .apply(lambda row: re.sub(r'http\S+', '', row))
     # replaced hyphens with spaces
-    df['cleaned'] = df.cleaned.apply(lambda row: re.sub(r'-', ' ', row))
+    df['cleaned_readme'] = df.cleaned_readme\
+                    .apply(lambda row: re.sub(r'-', ' ', row))
     
     return df
 
@@ -105,9 +111,9 @@ def extensive_clean(df):
     '''
     
     # run cleaner functions on text data
-    df['cleaned'] = df.cleaned.apply(lambda row: p.remove_stopwords(
-                                                 p.tokenize(
-                                                 p.basic_clean(row))))
+    df['cleaned_readme'] = df.cleaned_readme.apply(
+                                    lambda row: p.remove_stopwords(
+                                    p.tokenize(p.basic_clean(row))))
     
     return df
 
@@ -118,7 +124,7 @@ def create_char_counts(df):
     
     # create character counts for original and cleaned text
     df['original_char_length'] = df.readme_contents.apply(lambda row: len(row))
-    df['cleaned_char_length'] = df.cleaned.apply(lambda row: len(row))
+    df['cleaned_char_length'] = df.cleaned_readme.apply(lambda row: len(row))
     
     return df
 
@@ -180,13 +186,16 @@ def wrangle_github_repos(new_pickles=False, get_new_links=False,
         df = df[df.cleaned_char_length.isin(
                     p.filter_iqr_outliers(df.cleaned_char_length))]
         # create lemmatized cleaned column
-        df['lemmatized'] = df.cleaned.apply(p.lemmatize)
-        # order columns for preference
-        cols = ['repo', 'readme_contents', 'cleaned',
-                'lemmatized', 'original_char_length',
+        df['lemmatized_readme'] = df.cleaned_readme.apply(p.lemmatize)
+        # order and rename columns for preference
+        cols = ['repo', 'readme_contents', 'cleaned_readme',
+                'lemmatized_readme', 'original_char_length',
                 'cleaned_char_length', 'pct_char_removed',
                 'natural_language', 'language']
         df = df[cols].reset_index(drop=True)
+        df = df.rename(columns={'repo':'repository',
+                                'readme_contents':'original_readme',
+                                'language':'programming_language'})
         make_pickles(df, 'repos')
         return df
     # if file exists, unpickle
