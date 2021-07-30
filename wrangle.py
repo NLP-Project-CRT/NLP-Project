@@ -186,7 +186,7 @@ def wrangle_github_repos(new_pickles=False, get_new_links=False,
                 'lemmatized', 'original_char_length',
                 'cleaned_char_length', 'pct_char_removed',
                 'natural_language', 'language']
-        df = df[cols]
+        df = df[cols].reset_index(drop=True)
         make_pickles(df, 'repos')
         return df
     # if file exists, unpickle
