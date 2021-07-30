@@ -149,7 +149,8 @@ def filter_language(df):
     return df
 
 
-def wrangle_github_repos(new_pickles=False, get_new_links=False, number_of_pages=25):
+def wrangle_github_repos(new_pickles=False, get_new_links=False,
+                                             number_of_pages=25):
     '''
     '''
 
