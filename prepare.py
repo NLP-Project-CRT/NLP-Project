@@ -107,6 +107,21 @@ def prep_data(df, column, extra_words=[], exclude_words=[]):
     return df[['title', column,'clean', 'stemmed', 'lemmatized']]
 
 
+def filter_iqr_outliers(data, k=1.5):
+    '''
+    '''
+    
+    # define q1, q3, and iqr
+    q1, q3 = data.quantile([0.25, 0.75])
+    iqr = q3 - q1
+    # set upper and lower bounds for character count
+    upper_bound = iqr + q3 * k
+    lower_bound = iqr - q1 * k
+    # set filter masks for bounds
+    data = data[(data > lower_bound) & (data < upper_bound)]
+    
+    return data
+
 
 def split(df, stratify_by=None):
    
