@@ -16,6 +16,7 @@ from langdetect import detect
 
 # import prepare functions
 import prepare as p
+from acquire import get_repo_links, scrape_github_data
 
 
 #################### Pickle Data ####################
@@ -122,6 +123,17 @@ def create_char_counts(df):
     return df
 
 
+def create_pct_changed(df):
+    '''
+    '''
+
+    # calclate perecent change column, rounded to int
+    df['pct_char_removed'] = ((df.cleaned_char_length /
+                               df.original_char_length) * 100).astype(int)
+
+    return df
+
+
 def filter_language(df):
     '''
     '''
@@ -137,12 +149,18 @@ def filter_language(df):
     return df
 
 
-def wrangle_github_repos():
+def wrangle_github_repos(new_pickles=False, get_new_links=False, number_of_pages=25):
     '''
     '''
 
+    if get_new_links == True or isfile('data2.json') == False:
+        get_repo_links(number_of_pages=number_of_pages)
+        data = scrape_github_data()
+        json.dump(data, open('data2.json', 'w'), indent=1)
     # if file does not exist, or is overwritten, read in and pickle
-    if isfile('repos.pickle') == False:
+    if (isfile('repos.pickle') == False or
+                  get_new_links == True or
+                      new_pickles == True):
         # load data into DataFrame
         df = open_json_data()
         # filter data to only English results
@@ -153,6 +171,8 @@ def wrangle_github_repos():
         df = extensive_clean(df)
         # create character count columns
         df = create_char_counts(df)
+        # create percent change column
+        df = create_pct_changed(df)
         # filter for programming languages
         df = filter_language(df)
         # remove cleaned char count outliers
@@ -161,8 +181,9 @@ def wrangle_github_repos():
         # create lemmatized cleaned column
         df['lemmatized'] = df.cleaned.apply(p.lemmatize)
         # order columns for preference
-        cols = ['repo', 'readme_contents', 'original_char_length',
-                'cleaned', 'cleaned_char_length', 'lemmatized',
+        cols = ['repo', 'readme_contents', 'cleaned',
+                'lemmatized', 'original_char_length',
+                'cleaned_char_length', 'pct_char_removed',
                 'natural_language', 'language']
         df = df[cols]
         make_pickles(df, 'repos')
