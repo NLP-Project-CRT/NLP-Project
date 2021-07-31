@@ -1,6 +1,7 @@
 #Z0096
 
 # import standard libraries
+import numpy as np
 import pandas as pd
 import re
 
@@ -8,8 +9,9 @@ import re
 from os.path import isfile
 import pickle
 
-# import json handler
+# import data tools
 import json
+from sklearn.model_selection import train_test_split
 
 # import language detector
 from langdetect import detect
@@ -82,7 +84,7 @@ def get_english_only(df):
     return df
 
 
-def remove_code_snippest(df):
+def remove_code_snippets(df):
     '''
     '''
 
@@ -155,50 +157,125 @@ def filter_language(df):
     return df
 
 
+def prep_github_repos():
+    '''
+    '''
+
+    # load data into DataFrame
+    df = open_json_data()
+    # filter data to only English results
+    df = get_english_only(df)
+    # remove HTML, markdown, etc.
+    df = remove_code_snippets(df)
+    # remove non-ascii chars and stopwords, tokenize
+    df = extensive_clean(df)
+    # create character count columns
+    df = create_char_counts(df)
+    # create percent change column
+    df = create_pct_changed(df)
+    # filter for programming languages
+    df = filter_language(df)
+
+    return df
+
+
+def polish_github_repos(df):
+    '''
+    '''
+
+    # remove cleaned char count outliers
+    df = df[df.cleaned_char_length.isin(
+                p.filter_iqr_outliers(df.cleaned_char_length))]
+    # create lemmatized cleaned column
+    df['lemmatized_readme'] = df.cleaned_readme.apply(p.lemmatize)
+    # order and rename columns for preference
+    cols = ['repo', 'readme_contents', 'cleaned_readme',
+            'lemmatized_readme', 'original_char_length',
+            'cleaned_char_length', 'pct_char_removed',
+            'natural_language', 'language']
+    df = df[cols].reset_index(drop=True)
+    df = df.rename(columns={'repo':'repository',
+                            'readme_contents':'original_readme',
+                            'language':'programming_language'})
+
+    return df
+
+
+def encode_target(df):
+    '''
+    '''
+
+    # assign numerical values for each programming language
+    df['target_class'] = np.where(df.programming_language == \
+                                        'Python', 0, -1)
+    df['target_class'] = np.where(df.programming_language == \
+                                        'JavaScript', 1, df.target_class)
+    df['target_class'] = np.where(df.programming_language == \
+                                        'Jupyter Notebook', 2, df.target_class)
+    df['target_class'] = np.where(df.programming_language == \
+                                        'HTML', 3, df.target_class)
+    df['target_class'] = np.where(df.programming_language == \
+                                        'R', 4, df.target_class)
+    df['target_class'] = np.where(df.programming_language == \
+                                        'TypeScript', 5, df.target_class)
+    # set data type as int
+    df.target_class = df.target_class.astype(int)
+
+    return df
+
+
+def split_data(df):
+    '''
+    '''
+
+    # split test out from DataFrame
+    train_validate, test = train_test_split(df, test_size=0.2,
+                                            random_state=19,
+                                            stratify=df.target_class)
+    # split train and validate data sets
+    train, validate = train_test_split(train_validate, test_size=0.25,
+                                       random_state=19,
+                                       stratify=train_validate.target_class)
+    # split each into X, y sets
+    X_train = train.drop(columns=['programming_language', 'target_class'])
+    y_train = train[['programming_language', 'target_class']]
+    X_validate = validate.drop(columns=['programming_language', 'target_class'])
+    y_validate = validate[['programming_language', 'target_class']]
+    X_test = test.drop(columns=['programming_language', 'target_class'])
+    y_test = test[['programming_language', 'target_class']]
+
+    return (X_train, y_train,
+            X_validate, y_validate,
+            X_test, y_test)
+
+
 def wrangle_github_repos(new_pickles=False, get_new_links=False,
                                              number_of_pages=25):
     '''
     '''
 
     if get_new_links == True or isfile('data2.json') == False:
+        get_new_links = True
         get_repo_links(number_of_pages=number_of_pages)
         data = scrape_github_data()
         json.dump(data, open('data2.json', 'w'), indent=1)
     # if file does not exist, or is overwritten, read in and pickle
-    if (isfile('repos.pickle') == False or
-                  get_new_links == True or
-                      new_pickles == True):
-        # load data into DataFrame
-        df = open_json_data()
-        # filter data to only English results
-        df = get_english_only(df)
-        # remove HTML, markdown, etc.
-        df = remove_code_snippest(df)
-        # remove non-ascii chars and stopwords, tokenize
-        df = extensive_clean(df)
-        # create character count columns
-        df = create_char_counts(df)
-        # create percent change column
-        df = create_pct_changed(df)
-        # filter for programming languages
-        df = filter_language(df)
-        # remove cleaned char count outliers
-        df = df[df.cleaned_char_length.isin(
-                    p.filter_iqr_outliers(df.cleaned_char_length))]
-        # create lemmatized cleaned column
-        df['lemmatized_readme'] = df.cleaned_readme.apply(p.lemmatize)
-        # order and rename columns for preference
-        cols = ['repo', 'readme_contents', 'cleaned_readme',
-                'lemmatized_readme', 'original_char_length',
-                'cleaned_char_length', 'pct_char_removed',
-                'natural_language', 'language']
-        df = df[cols].reset_index(drop=True)
-        df = df.rename(columns={'repo':'repository',
-                                'readme_contents':'original_readme',
-                                'language':'programming_language'})
+    if (isfile('repos.pickle') == False or 
+                    get_new_links == True or
+                    new_pickles == True):
+        df = prep_github_repos()
+        df = polish_github_repos(df)
+        df = encode_target(df)
         make_pickles(df, 'repos')
-        return df
+        X_train, y_train, \
+        X_validate, y_validate, \
+        X_test, y_test = split_data(df)
     # if file exists, unpickle
     df = open_pickles('repos')
+    X_train, y_train, \
+    X_validate, y_validate, \
+    X_test, y_test = split_data(df)
 
-    return df
+    return (X_train, y_train,
+            X_validate, y_validate,
+            X_test, y_test)
