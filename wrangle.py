@@ -115,7 +115,8 @@ def extensive_clean(df):
     # run cleaner functions on text data
     df['cleaned_readme'] = df.cleaned_readme.apply(
                                     lambda row: p.remove_stopwords(
-                                    p.tokenize(p.basic_clean(row))))
+                                    p.tokenize(p.basic_clean(row)),
+                                    extra_words=['&#9;']))
     
     return df
 
