@@ -11,7 +11,7 @@
     * Contain notes from project planning.
 
 ## Goals
-- This project aims to predict what programming language a repository is, given the text of the README file  This will be a approached as NLP problem and will try to use various classification models to find the best accuracy score.
+- This project aims to predict what programming language a repository is, given the text of the README file. This will be approached as an NLP problem and will try to use various classification models to find the best accuracy score.
 
 ## Project Planning
 - Trello Board Link:
@@ -25,7 +25,7 @@
 ## Key Findings 
 * Majority of the Repositories were in the Python programming language.
 * Many of the same words were spread across all the top 5 programming languages making for a unreliable prediction.
-* Decision TREE was our best performing model over all, however we were expecting better accuracy results on validate datasets.
+* Decision Tree was our best performing model over all, however we were expecting better accuracy results on validate datasets.
 
 
 
