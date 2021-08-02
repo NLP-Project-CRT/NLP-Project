@@ -46,15 +46,25 @@
     3. Open `nlp_project_final.ipynb` and run the cells
 
 
-## Data Dictionary 
+## Data Context
 
-#### Target
-Name | Description | Type
-:---: | :---: | :---:
-language| Primary repository programming language | object
+The data used in this project was obtained through use of GitHub API to obtain contents of README.md from various repositories. This data is obtained through use of the `acquire.py` script and read into the notebooks using the `data2.json` it creates. To reproduce the exact results found within, the JSON file used can be found in the repository contents.
 
-#### Features
-Name | Description | Type
-:---: | :---: | :---:
-repo |  Repository url | object
-readme_contents  |  Text found in repository README files | object
+### Data Dictionary
+---
+
+Use of this data in a prepared manner throughout this project contains the data defined in the below data dictionary.
+
+
+| Variable             | Definition                                                  | Data Type |
+|----------------------|-------------------------------------------------------------|:---------:|
+| repository           | repository location in format <owner_username>/<repo_name>  | Object    |
+| original_readme      | original contents of README as taken from repository        | Object    |
+| cleaned_readme       | original_readme contents processed to only ASCII characters | Object    |
+| lemmatized_readme    | cleaned_readme contents lemmatized                          | Object    |
+| original_char_length | count of characters in original_readme                      | Integer   |
+| cleaned_char_length  | count of characters in cleaned_readme                       | Integer   |
+| pct_char_removed     | rounded percent of characters removed from original_readme  | Integer   |
+| natural_language     | natural language of README, all values equal `en`           | Object    |
+| programming_language | constructed languaged defined as marjoity code by GitHub    | Object    |
+| target_class         | integer value corresponding to programming_language         | Integer   |
