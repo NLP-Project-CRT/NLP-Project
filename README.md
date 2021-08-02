@@ -56,15 +56,15 @@ The data used in this project was obtained through use of GitHub API to obtain c
 Use of this data in a prepared manner throughout this project contains the data defined in the below data dictionary.
 
 
-| Variable             | Definition                                                  | Data Type |
-|----------------------|-------------------------------------------------------------|:---------:|
+| Variable             | Definition                                                    | Data Type |
+|----------------------|---------------------------------------------------------------|:---------:|
 | repository           | repository location in format `<owner_username>/<repo_name>`  | Object    |
-| original_readme      | original contents of README as taken from repository        | Object    |
-| cleaned_readme       | original_readme contents processed to only ASCII characters | Object    |
-| lemmatized_readme    | cleaned_readme contents lemmatized                          | Object    |
-| original_char_length | count of characters in original_readme                      | Integer   |
-| cleaned_char_length  | count of characters in cleaned_readme                       | Integer   |
-| pct_char_removed     | rounded percent of characters removed from original_readme  | Integer   |
-| natural_language     | natural language of README, all values equal `en`           | Object    |
-| programming_language | constructed languaged defined as marjoity code by GitHub    | Object    |
-| target_class         | integer value corresponding to programming_language         | Integer   |
+| original_readme      | original contents of README as taken from repository          | Object    |
+| cleaned_readme       | `original_readme` contents processed to only ASCII characters | Object    |
+| lemmatized_readme    | `cleaned_readme` contents lemmatized                          | Object    |
+| original_char_length | count of characters in `original_readme`                      | Integer   |
+| cleaned_char_length  | count of characters in `cleaned_readme`                       | Integer   |
+| pct_char_removed     | rounded percent of characters removed from `original_readme`  | Integer   |
+| natural_language     | natural language of README, all values equal `en`             | Object    |
+| programming_language | constructed languaged defined as marjoity code by GitHub      | Object    |
+| target_class         | integer value corresponding to `programming_language`         | Integer   |
