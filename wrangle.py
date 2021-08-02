@@ -1,5 +1,6 @@
 #Z0096
 
+
 # import standard libraries
 import numpy as np
 import pandas as pd
@@ -55,6 +56,8 @@ def open_pickles(filename):
 
 def open_json_data():
     '''
+    Opens "data2.json" containing nested repo and readme data, deletes
+    null entires, and returns a normalized DataFrame
     '''
     
     # open data file and load with json
@@ -74,6 +77,8 @@ def open_json_data():
 
 def get_english_only(df):
     '''
+    Take argument DataFrame and uses langdetect library to only retain
+    English natural language readme files
     '''
     
     # detect natural language of repo
@@ -86,6 +91,8 @@ def get_english_only(df):
 
 def remove_code_snippets(df):
     '''
+    Takes argument DataFrame and removes obvious HTML and markup code
+    present in the readme before returning DataFrame
     '''
 
     # remove HTML and markdown code
@@ -110,6 +117,8 @@ def remove_code_snippets(df):
 
 def extensive_clean(df):
     '''
+    Applies remove_stopwords, tokenize, and basic_clean to readme
+    contents and creates new column to hold in DataFrame
     '''
     
     # run cleaner functions on text data
@@ -123,6 +132,8 @@ def extensive_clean(df):
 
 def create_char_counts(df):
     '''
+    Appends new columns for character counds of original and cleaned
+    readme contents before returning
     '''
     
     # create character counts for original and cleaned text
@@ -134,6 +145,8 @@ def create_char_counts(df):
 
 def create_pct_changed(df):
     '''
+    Calculates percentage difference between original and cleaned
+    readme contents and returns DataFrame with new column
     '''
 
     # calclate perecent change column, rounded to int
@@ -145,6 +158,8 @@ def create_pct_changed(df):
 
 def filter_language(df):
     '''
+    Filters passed DataFrame for only programmining langauges specifed
+    in the below .isin() method
     '''
     
     # filter for programming languges with 10 or more
@@ -160,6 +175,9 @@ def filter_language(df):
 
 def prep_github_repos():
     '''
+    Performs several functions to prepare passed DataFrame and its
+    columns to contain no HTML/markup, only containg certain
+    programming languages, and only English natural language
     '''
 
     # load data into DataFrame
@@ -182,6 +200,9 @@ def prep_github_repos():
 
 def polish_github_repos(df):
     '''
+    Performs several functions to create new columns on passed
+    DataFrame and rename existing columns to more clearly reflect
+    contents
     '''
 
     # remove cleaned char count outliers
@@ -204,6 +225,15 @@ def polish_github_repos(df):
 
 def encode_target(df):
     '''
+    Takes passed DataFrame and creates new column to hold integer for
+    respectice programming language on observation
+
+    0 == 'Python',
+    1 == 'JavaScript',
+    2 == 'Jupyter Notebook',
+    3 == 'HTML',
+    4 == 'R',
+    5 == 'TypeScript'
     '''
 
     # assign numerical values for each programming language
@@ -227,6 +257,8 @@ def encode_target(df):
 
 def split_data(df):
     '''
+    Splits repository DataFrame to X and y for train, validate, and 
+    test data sets, returns tuple of six prepared DataFrames
     '''
 
     # split test out from DataFrame
@@ -253,6 +285,16 @@ def split_data(df):
 def wrangle_github_repos(new_pickles=False, get_new_links=False,
                                              number_of_pages=25):
     '''
+    Performs total preparation and reading in of "data2.json" for
+    GitHub repository data and stores within a .pickle file
+
+    new_pickles : Set True if need overwriting existing pickle file
+
+    get_new_links: Set True if reacquiring all new repo links
+                   WARNING: long procedure, computationally intensive
+
+    number_of_pages: int value for the number of pages to parse for
+                     repo links; Default == 25
     '''
 
     if get_new_links == True or isfile('data2.json') == False:
