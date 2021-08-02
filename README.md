@@ -58,7 +58,7 @@ Use of this data in a prepared manner throughout this project contains the data 
 
 | Variable             | Definition                                                  | Data Type |
 |----------------------|-------------------------------------------------------------|:---------:|
-| repository           | repository location in format <owner_username>/<repo_name>  | Object    |
+| repository           | repository location in format `<owner_username>/<repo_name>`  | Object    |
 | original_readme      | original contents of README as taken from repository        | Object    |
 | cleaned_readme       | original_readme contents processed to only ASCII characters | Object    |
 | lemmatized_readme    | cleaned_readme contents lemmatized                          | Object    |
