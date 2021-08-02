@@ -69,3 +69,19 @@ Use of this data in a prepared manner throughout this project contains the data 
 | natural_language     | natural language of README, all values equal `en`             | Object    |
 | programming_language | constructed languaged defined as marjoity code by GitHub      | Object    |
 | target_class         | integer value corresponding to `programming_language`         | Integer   |
+
+
+
+| Model                    |Vectorization  |  Train Score  |Validate Score | Test Score  |   
+|:-------------------------|---------------|:--------------|:--------------|:------------|
+| Baseline                 | ---           | 44.09%        | ----          |  ----       |
+| Random Forest            | cv            | 100%          | 53.49%        |  ----       |
+| Random Forest            | bi            | 94.49%        | 53.49%        |  ----       |
+| Random Forest            | tdidf         | 94.49%        | 53.49%        |  58.14%     |
+| Naive Bayes              | cv            | 92.13         | 48.84%        |  ----       |
+| Naive Bayes              | bi            | 100%          | 44.19%        |  ----       |
+| Naive Bayes              | tdidf         | 100%          | 44.19%        |  ----       |
+
+
+
+
