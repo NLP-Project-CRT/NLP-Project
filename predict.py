@@ -4,19 +4,18 @@
 ####
 ####
 ####
-####  Run "python predict.py" on command line and pass the location of a readme file.
-####                 Can be a file path or URL to raw GitHub readme
-####
-####
+####  Run "python predict.py" on command line 
+####     and pass URL of raw readme file.
 ####
 ####
 
 
 import re
 import pickle
-
+import requests
 from prepare import lemmatize, remove_stopwords, remove_stopwords, basic_clean
 from wrangle import open_pickles
+
 
 def remove_code_snippets(readme):
     '''
@@ -36,12 +35,14 @@ def remove_code_snippets(readme):
     readme = re.sub(r'-', ' ', row)
     return readme
 
-def predict_readme_lang(readme):
+def predict_readme_lang(readme_url):
     '''
-    Takes in path and file name of README document and prints
+    Takes URL of README document and prints
     the predicted language and the probability.
     '''
 
+    response = requests.get(str(readme_url))
+    readme = response.text
     # clean, tokenize, remove stopwords, and lematize
     readme = lemmatize(remove_stopwords(remove_stopwords(basic_clean(readme))))
     # open fitted tfidf object
@@ -74,4 +75,4 @@ def predict_readme_lang(readme):
 
 
 readme = input('Provide location of readme document: ')
-predict_readme_lang(str(readme))
+predict_readme_lang(readme)
